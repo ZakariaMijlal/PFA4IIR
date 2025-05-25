@@ -1,0 +1,24 @@
+{% extends "core/base.html" %}
+
+{% block title %}Professor Dashboard{% endblock %}
+
+{% block content %}
+<h2>Upload a PDF Course</h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Upload</button>
+</form>
+
+<h2>Uploaded PDFs</h2>
+<ul>
+    {% for material in materials %}
+        <li>
+            <strong>{{ material.title }}</strong> — 
+            <a href="{{ material.file.url }}" target="_blank">View</a>
+        </li>
+    {% empty %}
+        <li>No PDFs uploaded yet.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

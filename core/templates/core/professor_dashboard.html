@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <title>Professor Dashboard</title>
+    <style>
+        :root {
+            --primary-color: #10b981; /* Green accent */
+            --text-color: #333;
+            --secondary-text: #666;
+            --background: #ffffff;
+            --card-bg: #f9f9f9;
+            --border-color: #ddd;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --text-color: #f1f5f9;
+                --secondary-text: #94a3b8;
+                --background: #1e293b;
+                --card-bg: #334155;
+                --border-color: #475569;
+            }
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            border-radius: 12px;
+            background-color: var(--card-bg);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #059669;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        form {
+            margin-bottom: 2rem;
+        }
+
+        .course-section {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--background);
+        }
+
+        .course-section h3 {
+            margin-top: 0;
+        }
+
+        ul {
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        p {
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Professor Dashboard</h1>
+        <p>Welcome, {{ user.username }}!</p>
+
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit">Log out</button>
+        </form>
+
+        <!-- Course Creation Section -->
+        <h2>Create New Course</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ course_form.as_p }}
+            <button type="submit" name="create_course">Create Course</button>
+        </form>
+
+        <!-- Material Upload Section -->
+        <h2>Upload Course Material</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ material_form.as_p }}
+            <button type="submit" name="upload_material">Upload Material</button>
+        </form>
+
+        <!-- Courses and Materials List -->
+        <h2>Your Courses & Materials</h2>
+        {% for course in courses %}
+            <div class="course-section">
+                <h3>{{ course.title }} ({{ course.code }})</h3>
+                <ul>
+                    {% for material in materials %}
+                        {% if material.course == course %}
+                        <li>
+                            <strong>{{ material.title }}</strong> —
+                            <a href="{{ material.file.url }}" target="_blank">View</a> —
+                            <em>Uploaded: {{ material.uploaded_at|date:"M d, Y" }}</em>
+                        </li>
+                        {% endif %}
+                    {% empty %}
+                        <li>No materials uploaded for this course yet</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% empty %}
+            <p>No courses created yet. Create your first course using the form above.</p>
+        {% endfor %}
+    </div>
+</body>
+</html>
